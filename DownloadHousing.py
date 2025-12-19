@@ -5,6 +5,9 @@ import time
 import ssl
 import http.client
 
+# Import the sensitive variables
+from config import API_KEY, COMMUNITY
+
 # --- CONFIGURATION ---
 API_KEY = "0ea16721107a2c91af7ea7286c7d6336b0af52ed3d9230e85483110531d1ba88"
 COMMUNITY = "springfieldma" 
@@ -55,7 +58,8 @@ def extract_clean_data(record_raw, applicant_raw, location_raw, workflow_raw):
     if workflow_raw:
         for step in workflow_raw:
             step_attrs = step.get("attributes", {})
-            step_name = step_attrs.get("label")
+            step_name = step_attrs.get("step_name")
+            step_name = step_attrs.get("step_name")
             
             # --- THE FILTER ---
             # If name is None or Empty String, skip this step entirely
