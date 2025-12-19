@@ -1,0 +1,9 @@
+# Ignore the secrets
+config.py
+
+# Ignore the data dumps
+*.json
+*.csv
+
+# Ignore python cache
+__pycache__/
