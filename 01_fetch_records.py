@@ -4,10 +4,11 @@ import urllib3
 import time
 from config import API_KEY, BASE_URL
 
+# Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def fetch_basic_records():
-    print("🚀 STEP 1: Fetching Basic Records List...")
+def fetch_records_with_numbers():
+    print("🚀 STEP 1: Fetching Records (Flattens Data)...")
     
     headers = {"Authorization": f"Token {API_KEY}", "Accept": "application/json"}
     s = requests.Session()
@@ -15,13 +16,12 @@ def fetch_basic_records():
 
     all_records = []
     page_num = 1
-    page_size = 20 # Can increase this to 50 or 100 for speed
+    page_size = 50 
     keep_fetching = True
 
     while keep_fetching:
-        print(f"   Fetching Page {page_num}...", end=" ")
+        print(f"    Fetching Page {page_num}...", end=" ")
         
-        # URL with manual params to avoid encoding issues
         list_url = f"{BASE_URL}/records?page[number]={page_num}&page[size]={page_size}"
         
         try:
@@ -42,19 +42,37 @@ def fetch_basic_records():
                 print("Done.")
                 break
 
-            # We only keep the ID and Attributes (Strip out links/relationships to save space)
             for item in batch:
+                attrs = item.get("attributes", {})
+                
+                # --- FLATTENED STRUCTURE (No nested 'attributes') ---
                 clean_item = {
                     "id": item.get("id"),
-                    "attributes": item.get("attributes", {})
+                    "type": item.get("type"),
+                    # Pull fields directly to the top level
+                    "number": attrs.get("number"),
+                    "histID": attrs.get("histID"),
+                    "histNumber": attrs.get("histNumber"),
+                    "typeDescription": attrs.get("typeDescription"),
+                    "status": attrs.get("status"),
+                    "isEnabled": attrs.get("isEnabled"),
+                    "submittedAt": attrs.get("submittedAt"),
+                    "expiresAt": attrs.get("expiresAt"),
+                    "renewalOfRecordID": attrs.get("renewalOfRecordID"),
+                    "renewalNumber": attrs.get("renewalNumber"),
+                    "submittedOnline": attrs.get("submittedOnline"),
+                    "renewalSubmitted": attrs.get("renewalSubmitted"),
+                    "createdAt": attrs.get("createdAt"),
+                    "updatedAt": attrs.get("updatedAt"),
+                    "createdBy": attrs.get("createdBy"),
+                    "updatedBy": attrs.get("updatedBy")
                 }
                 all_records.append(clean_item)
 
             print(f"Got {len(batch)}. Total: {len(all_records)}")
             
             page_num += 1
-            # REMOVE THIS LIMIT TO GET EVERYTHING
-            if page_num > 2: keep_fetching = False 
+            if page_num > 10: keep_fetching = False 
 
         except Exception as e:
             print(f"\n❌ CRASH: {e}")
@@ -66,4 +84,4 @@ def fetch_basic_records():
     print(f"✅ Saved {len(all_records)} records to 'data_records.json'")
 
 if __name__ == "__main__":
-    fetch_basic_records()
+    fetch_records_with_numbers()
