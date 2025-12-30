@@ -3,3 +3,5 @@ https://developer.opengov.com/catalog/plc-api/
 
 Authorization - Token xxxxxxx
 Accept - application/json
+
+housing enf record type 1006586
